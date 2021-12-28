@@ -15,17 +15,27 @@ let userSchema = mongoose.Schema({
     }
 })
 
-userSchema.pre('save', (next) => {
+userSchema.pre('save', function(next) {
     if (this.isNew || this.isModified('password')) {
-        bcrypt.hash(this.password, 10, (err, hashedPassword) => {
-            if (err) {
-                next(err)
-            } else {
-                this.password = hashedPassword
-                next();
-            }
-        })
+        bcrypt.hash(this.password, 10,
+            (err, hashedPassword) => {
+                if (err) {
+                    next(err);
+                } else {
+                    this.password = hashedPassword
+                    next();
+                }
+            })
     }
 })
 
+userSchema.methods.isCorrectPassword = function(password, callback) {
+    bcrypt.compare(password, this.password, function(err, same) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(err, same);
+        }
+    })
+}
 module.exports = mongoose.model("User", userSchema)
