@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const Note = require('../models/note');
-const withAuth = require("../middlewares/auth")
+const withAuth = require("../middlewares/auth");
+const { route } = require('express/lib/application');
 
 router.post('/', withAuth, async(req, res) => {
     const { title, body } = req.body;
@@ -15,7 +16,19 @@ router.post('/', withAuth, async(req, res) => {
         res.status(500).json({ error: 'Problem to Create a new note' });
     }
 })
+router.get('/search', withAuth, async(req, res) => {
+    const { query } = req.query;
+    try {
+        let notes = await Note
+            .find({ author: req.user._id })
+            .find({ $text: { $search: query } })
+        res.json(notes)
 
+    } catch (error) {
+        res.json({ error }).status(500)
+    }
+
+})
 router.get('/:id', withAuth, async(req, res) => {
 
     try {
