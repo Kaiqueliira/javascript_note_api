@@ -32,6 +32,28 @@ router.get('/:id', withAuth, async(req, res) => {
     }
 })
 
+router.get('/', withAuth, async(req, res) => {
+    try {
+
+        let notes = await Note.find({ author: req.user._id })
+        res.json(notes);
+
+    } catch (err) {
+        res.json({ err }).status(500)
+    }
+})
+
+router.put('/:id', withAuth, async function(req, res) {
+    const { title, body } = req.body;
+    const { id } = req.params;
+    try {
+        var note = await Note.findOneAndUpdate({ _id: id }, { $set: { title: title, body: body } }, { upsert: true, 'new': true })
+        res.json(note);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 const isOwner = (user, note) => {
     if (JSON.stringify(user._id) == JSON.stringify(note.author._id)) {
         return true;
