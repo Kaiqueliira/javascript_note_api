@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
-let url =
-  "mongodb+srv://admin:jsnote1234@cluster0.sk23a.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-
+require("dotenv").config();
+const MONGO_URL = process.env.MONGO_URL;
 mongoose
-  .connect(url, {
+  .connect(MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
